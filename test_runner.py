@@ -2,26 +2,34 @@ from test import run
 import time
 import traceback
 import subprocess
+from flask import Flask
 
-print("🚀 Starting Render test...")
+app = Flask(__name__)
 
-# 🔥 FORCE INSTALL BROWSER AT RUNTIME
-try:
-    print("🔧 Installing Chromium (runtime)...")
-    subprocess.run(["python", "-m", "playwright", "install", "chromium"], check=True)
-    print("✅ Chromium installed")
-except Exception as e:
-    print("❌ Install failed:", e)
+@app.route("/")
+def home():
+    return "Test running..."
 
-# 🔥 RUN SCRIPT
-try:
-    run()
-except Exception as e:
-    print("❌ ERROR OCCURRED:")
-    traceback.print_exc()
+def start_test():
+    print("🚀 Starting Render test...")
 
-print("⏳ Keeping service alive...")
+    try:
+        print("🔧 Installing Chromium...")
+        subprocess.run(["python", "-m", "playwright", "install", "chromium"], check=True)
+        print("✅ Chromium installed")
+    except Exception as e:
+        print("❌ Install failed:", e)
 
-# keep alive (important for Render)
-while True:
-    time.sleep(60)
+    try:
+        run()
+    except Exception:
+        print("❌ ERROR:")
+        traceback.print_exc()
+
+# 🔥 RUN TEST IN BACKGROUND
+import threading
+threading.Thread(target=start_test).start()
+
+# 🔥 KEEP SERVER ALIVE (VERY IMPORTANT)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)

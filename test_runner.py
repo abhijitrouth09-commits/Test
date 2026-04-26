@@ -1,6 +1,17 @@
 from test import run
+import time
+import traceback
 
-if __name__ == "__main__":
-    print("🚀 Starting Render test...")
+print("🚀 Starting Render test...")
+
+try:
     run()
-    print("✅ Finished")
+except Exception as e:
+    print("❌ ERROR OCCURRED:")
+    traceback.print_exc()
+
+print("⏳ Keeping service alive...")
+
+# 🔥 keep alive so Render doesn't stop
+while True:
+    time.sleep(60)
